@@ -52,8 +52,8 @@ Vec findBestMove(GameState game){
     int bestScore = min;
     Vec bestMove;
 
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
+    for (int i = 0; i < game.size; i++) {
+        for (int j = 0; j < game.size; j++) {
             if(game.grid[i][j] == -1) {
                 game.grid[i][j] = 1;
                 int score = minimax(game, 0, false, min, max);
@@ -62,6 +62,7 @@ Vec findBestMove(GameState game){
                     bestScore = score;
                     bestMove.set(i,j);
                 }
+            }
 
         }
     }
