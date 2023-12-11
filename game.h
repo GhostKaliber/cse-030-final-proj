@@ -11,8 +11,8 @@ void printMenu() {
     std :: cout << "Welcome to Tic-Tac-Toe\n" << std :: endl;
     std :: cout << "  1. PLay against the computer" << std :: endl;
     std :: cout << "  2. Play against a human opponent" << std :: endl;
-    std :: cout << "  3. Settings" << std :: endl;
-    std :: cout << "  4. Exit\n" << std :: endl;
+    //std :: cout << "  3. Settings" << std :: endl;
+    std :: cout << "  3. Exit\n" << std :: endl;
     std :: cout << "Enter choice: ";    
 }
 
@@ -60,6 +60,8 @@ void runGame(GameState game) {
 
     while ( input != 4 ) {
     if (input == 1) {
+        system("clear");
+        difficulty = settings();
         if ( difficulty == 1 ) {
             system("clear");
             easyBot();
@@ -70,10 +72,11 @@ void runGame(GameState game) {
     } else if (input == 2) {
         system("clear");
         humanOpponent(game);
-    } else if (input == 3) {
-        system("clear");
-        difficulty = settings();
-    }
+    } 
+    // else if (input == 3) {
+    //     system("clear");
+    //     difficulty = settings();
+    // }
         printMenu();
         std :: cin >> input;
     }
