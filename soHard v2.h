@@ -10,41 +10,55 @@
 int min_int = -999999999;
 int max_int = 999999999;
 
-//minimax algorithm that simulates moves n assigns score
-int minimax(GameState state, int depth, bool turn)
-{
-    if(depth > 50){ //amount of moves to look at
-        std::cout << "depth reached:" << depth << std::endl;
-        return 0;
+int eval(GameState game){ //dont actually need this ?
+    if(game.hasWon(0)){ // x player, maximizing
+        return (game.size-game.turnCount) + 1;
+    } else if(game.hasWon(1)) { //o player, minimizing
+        return ((game.size-game.turnCount) + 1) * -1;
+    } else {
+        return 0; //tie condition score
     }
+}
+//0 = false, 1 = true
+//minimax algorithm that simulates moves n assigns score
+int minimax(GameState& state, int depth, bool turn)  //depth is look ahead
+{
+    //if statement could be condensed with a ternary thing for min n max
     int bestScore;
 
-    if(turn){
+    if(depth >= state.size * state.size || state.done){
+        return eval(state);
+    }
+
+    if(turn){ //maximizing, X = 0
         bestScore = min_int; //super negative number
-        for(int i = 0;i <state.size; i++){
-            for (int j = 0; j<state.size; j++){
+        for(int i = 0;i < state.size; i++){
+            for (int j = 0; j< state.size; j++){
                 if(state.grid[i][j] == -1){
-                    state.grid[i][j] = 1; //play move
-                    int t_score = minimax(state, depth+1, false); //calc score
-                    state.grid[i][j] = -1; //reverses move
-                    bestScore = std::max(bestScore, t_score); //get max score
+                    //state.grid[i][j] = 0; //hardcoded playing X/0 instead of using currturn
+                    GameState cp = state;
+                    cp.play(i,j);
+                    bestScore = std::max(bestScore, minimax(cp, depth+1, !turn)); //calc score, turn = false
+                    //state.grid[i][j] = -1; //reverses move
                 }
             }
         }
-    } else {
+        return bestScore;
+    } else { //minimizing, O = 1
         bestScore = max_int; 
         for (int i = 0; i < state.size; i++){
             for(int j =0; j < state.size; j++){
                 if(state.grid[i][j]==-1){
-                    state.grid[i][j] = 0;
-                    int t_score = minimax(state, depth+1, true);
-                    state.grid[i][j] = -1;
-                    bestScore = std::min(bestScore, t_score);
+                    //state.grid[i][j] = 1; //hardcoded playing O/1 instead of using currentTurn
+                    GameState cp = state;
+                    cp.play(i,j);
+                    bestScore = std::min(bestScore, minimax(cp, depth+1, !turn));//turn = true
+                    //state.grid[i][j] = -1;
                 }
             }
         }
+        return bestScore;
     }
-    return bestScore;
 }
 
 
@@ -53,19 +67,21 @@ int minimax(GameState state, int depth, bool turn)
 Vec findBestMove(GameState game)
 {
     int bestScore = min_int;
-    Vec bmove;
-    bmove.set(-1,-1); //set move to none for now
+    Vec bmove(0,0);
+    //bmove.set(-1,-1); //set move to none for now
 
     for (int i = 0; i < game.size; i++){ //goes thru grid calculating best score w algorithm 
                                          //lowkey could probs condense into one func w minmax
-            for(int j =0; j < game.size; j++){
+            for(int j = 0; j < game.size; j++){
                 if(game.grid[i][j] == -1){ //empty space
-                    game.play(i,j);
-                    int moveScore = minimax(game, 0, game.currentTurn);
-                    game.grid[i][j] = -1;
+                    GameState cp = game;
+                    cp.play(i,j);
+                    int moveScore = minimax(cp, 0, false);
+                    //game.grid[i][j] = -1;
                     if(moveScore > bestScore){
                         bestScore = moveScore;
-                        bmove.set(i,j);
+                        bmove = Vec(i,j);
+                        std::cout << "--" << bmove << std::endl;
                     }
                 }
             }
@@ -81,7 +97,7 @@ void britishBot(){
         std::cout << game << std::endl;
         int x,y;
         
-        if(game.currentTurn){
+        if(game.currentTurn){ //currentTurn = 1
             std::cout << "computer move!!(" << (!game.currentTurn ? "X" : "O") << "):" << std::endl;
             Vec move = findBestMove(game);
             x = move.x;
