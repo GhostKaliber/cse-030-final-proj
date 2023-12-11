@@ -4,6 +4,8 @@
 #include "GameState.h"
 
 #include <iostream>
+#include <vector>
+#include <time.h>
 
 bool validInput(int x, int y){
     if ((x == 0 || x == 1 || x == 2) && (y == 0 || y == 1 || y == 2)) {
@@ -14,17 +16,23 @@ bool validInput(int x, int y){
 }
 
 Vec validMove(GameState game){
+    std::vector<Vec> moves;
     for (int i = 0; i < game.size; i++){
         for (int j = 0; j < game.size; j++){
             if (game.grid[i][j] == -1){
-                return Vec(i, j);
+                moves.push_back(Vec(i, j));
             }
         }
     }
-    return Vec(0,0);
+    srand(time(NULL));
+    int index = rand() % moves.size();
+    try{ //to lmk if smth is buggy
+        return moves.at(index);
+    } catch (const std::out_of_range& e) { 
+        std::cout << "index " << index << " out of range :(" << std::endl;
+    }
+    return Vec(0, 0); //avoid warning abt not returning anything
 }
-
-//could make more random?
 
 void easyBot(){
     GameState game;
